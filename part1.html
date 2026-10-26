@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>About You — Part 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Alexandria:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F3F2FF; --surface: #FFFFFF; --ink: #1E2140; --muted: #5D6088; --line: #DCDAF5;
+  --accent: #5B4BDB; --accent-soft: #E7E4FF; --highlight: #F5B83D;
+  --shadow: 0 2px 12px rgba(91,75,219,.08);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14162A; --surface: #1F2240; --ink: #EEECFF; --muted: #A6A8CC; --line: #34386A;
+    --accent: #9C90FF; --accent-soft: #2C2D5C; --highlight: #F5C25A;
+    --shadow: 0 2px 12px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14162A; --surface: #1F2240; --ink: #EEECFF; --muted: #A6A8CC; --line: #34386A;
+  --accent: #9C90FF; --accent-soft: #2C2D5C; --highlight: #F5C25A;
+  --shadow: 0 2px 12px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box }
+html { height: 100% }
+body {
+  margin: 0; min-height: 100%; background: var(--bg); color: var(--ink);
+  font-family: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+.wrap { max-width: 640px; margin: 0 auto; padding-block: 28px 48px }
+h2 { font-size: 24px; line-height: 1.15; font-weight: 800; margin: 0 0 6px; letter-spacing: -.01em }
+p { margin: 0 0 14px }
+.muted { color: var(--muted) }
+
+.home-btn {
+  position: fixed; top: max(14px, env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px));
+  z-index: 50; background: var(--surface); border: 2px solid var(--line); border-radius: 12px;
+  padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 700; color: var(--muted);
+  cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  box-shadow: var(--shadow);
+}
+.home-btn:hover { color: var(--ink); border-color: var(--ink) }
+
+.step { font-weight: 600; color: var(--accent); font-size: 15px; margin-bottom: 10px; margin-top: 40px }
+.bar { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 0 0 22px }
+.bar > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .3s ease }
+
+.sec-head {
+  border-left: 4px solid var(--accent); padding-left: 14px; margin-bottom: 6px;
+}
+
+.field { margin: 0 0 22px }
+label.q { display: block; font-weight: 600; margin: 0 0 8px }
+textarea {
+  width: 100%; font: inherit; color: var(--ink); background: var(--surface);
+  border: 2px solid var(--line); border-radius: 16px; padding: 12px 14px;
+  min-height: 84px; resize: vertical; box-shadow: var(--shadow);
+}
+textarea:focus-visible, input:focus-visible, .chip:focus-visible {
+  outline: 3px solid var(--highlight); outline-offset: 2px;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px }
+.chip {
+  border: 2px solid var(--line); background: var(--surface); border-radius: 99px;
+  padding: 8px 14px; font: inherit; font-weight: 600; font-size: 15px;
+  cursor: pointer; color: var(--ink); box-shadow: var(--shadow);
+}
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff }
+
+.other {
+  width: 100%; font: inherit; font-size: 16px; font-weight: 600; color: var(--ink);
+  background: var(--bg); border: 2px dashed var(--line); border-radius: 16px;
+  padding: 13px 14px; margin-top: 10px;
+}
+.other::placeholder { color: var(--muted); font-weight: 400 }
+.other.picked { background: var(--highlight); border: 2px solid var(--ink); color: #1E2140 }
+.chips + .other { border-radius: 99px; padding: 8px 16px; font-size: 15px }
+
+button { font: inherit; cursor: pointer; color: inherit }
+.btn {
+  display: inline-block; border: 0; border-radius: 14px; padding: 14px 22px;
+  font-weight: 800; font-size: 17px; background: var(--ink); color: var(--bg);
+  box-shadow: 0 2px 0 rgba(30,33,64,.12);
+}
+.btn.ghost { background: transparent; color: var(--muted); box-shadow: none; padding: 14px 8px; font-weight: 600 }
+.btn:focus-visible { outline: 3px solid var(--highlight); outline-offset: 2px }
+
+.row { display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-top: 24px }
+
+/* Done screen */
+.hero-badge {
+  width: 100px; height: 100px; border-radius: 26px; background: var(--accent);
+  border: 3px solid var(--ink); box-shadow: 0 6px 0 var(--ink);
+  display: grid; place-items: center; font-size: 48px; margin: 0 0 20px; transform: rotate(-4deg);
+}
+.code {
+  width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px;
+  min-height: 100px; word-break: break-all; background: var(--surface); color: var(--ink);
+  border: 2px solid var(--line); border-radius: 16px; padding: 12px 14px; resize: vertical;
+}
+.ok { color: #1F9E91; font-weight: 800 }
+.done-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px }
+.done-actions .btn { font-size: 15px; padding: 12px 18px }
+
+@media (prefers-reduced-motion: reduce) { .bar > i { transition: none } }
+</style>
+</head>
+<body>
+<a href="index.html" class="home-btn">← Home</a>
+<main class="wrap" id="app"></main>
+
+<script src="shared.js"></script>
+<script>
+var KEY = "lq_p1";
+var st = getPartState(KEY) || { sec: 0, a: {} };
+var app = document.getElementById("app");
+
+function save() { setPartState(KEY, st); }
+
+function render() {
+  if (st.sec >= P1.length) { renderDone(); return; }
+  var sec = P1[st.sec];
+  var h = '';
+  h += '<div class="step">About you, ' + (st.sec + 1) + ' of ' + P1.length + '</div>';
+  h += '<div class="bar"><i style="width:' + (st.sec / P1.length * 100) + '%"></i></div>';
+  h += '<div class="sec-head"><h2>' + esc(sec.sec) + '</h2></div>';
+  h += '<p class="muted">Skip anything you don’t have an answer for.</p>';
+  h += '<div style="margin-top:20px">';
+
+  sec.qs.forEach(function (q) {
+    var v = st.a[q.id];
+    h += '<div class="field"><label class="q" ' +
+      (q.type === "text" ? 'for="' + q.id + '"' : 'id="l_' + q.id + '"') + '>' + esc(q.t) + '</label>';
+
+    if (q.type === "text") {
+      h += '<textarea id="' + q.id + '" data-id="' + q.id + '">' + esc(v || "") + '</textarea>';
+    } else {
+      var arr = Array.isArray(v) ? v : (v ? [v] : []);
+      h += '<div class="chips" role="group" aria-labelledby="l_' + q.id + '">';
+      var list = q.opts.concat(arr.filter(function (x) { return q.opts.indexOf(x) < 0; }));
+      list.forEach(function (o) {
+        h += '<button type="button" class="chip" data-q="' + q.id + '" data-t="' + q.type +
+          '" aria-pressed="' + (arr.indexOf(o) > -1) + '">' + esc(o) + '</button>';
+      });
+      h += '</div>';
+      h += '<input type="text" class="other" data-q="' + q.id + '" data-t="' + q.type +
+        '" aria-label="Something else" placeholder="Something else? Type it and press Enter">';
+    }
+    h += '</div>';
+  });
+
+  h += '</div>';
+  h += '<div class="row">';
+  h += '<button class="btn ghost" id="bk">' + (st.sec > 0 ? 'Back' : '') + '</button>';
+  h += '<button class="btn" id="nx">' + (st.sec < P1.length - 1 ? 'Next' : 'See my code') + '</button>';
+  h += '</div>';
+
+  app.innerHTML = h;
+  bindEvents();
+}
+
+function bindEvents() {
+  app.querySelectorAll("textarea").forEach(function (t) {
+    t.oninput = function () { st.a[t.dataset.id] = t.value; save(); };
+  });
+
+  app.querySelectorAll(".chip").forEach(function (c) {
+    c.onclick = function () {
+      var id = c.dataset.q, txt = c.textContent;
+      if (c.dataset.t === "one") {
+        st.a[id] = txt;
+        app.querySelectorAll('.chip[data-q="' + id + '"]').forEach(function (x) {
+          x.setAttribute("aria-pressed", x === c);
+        });
+      } else {
+        var arr = Array.isArray(st.a[id]) ? st.a[id] : [];
+        var i = arr.indexOf(txt);
+        if (i > -1) arr.splice(i, 1); else arr.push(txt);
+        st.a[id] = arr;
+        c.setAttribute("aria-pressed", i === -1);
+      }
+      save();
+    };
+  });
+
+  app.querySelectorAll("input.other").forEach(function (inp) {
+    inp.onkeydown = function (e) {
+      if (e.key !== "Enter" || e.isComposing) return;
+      e.preventDefault();
+      var v = inp.value.trim(), id = inp.dataset.q;
+      if (!v) return;
+      if (inp.dataset.t === "one") st.a[id] = v;
+      else {
+        var arr = Array.isArray(st.a[id]) ? st.a[id] : [];
+        if (arr.indexOf(v) < 0) arr.push(v);
+        st.a[id] = arr;
+      }
+      save(); render();
+      var n = app.querySelector('input.other[data-q="' + id + '"]');
+      if (n) n.focus();
+    };
+  });
+
+  var bk = document.getElementById("bk");
+  if (bk) bk.onclick = function () {
+    if (st.sec > 0) { st.sec--; save(); render(); window.scrollTo(0, 0); }
+  };
+
+  var nx = document.getElementById("nx");
+  if (nx) nx.onclick = function () {
+    st.sec++;
+    save(); render(); window.scrollTo(0, 0);
+  };
+}
+
+function renderDone() {
+  var code = encodePart("LQP1", { v: 2, n: getName(), d: new Date().toISOString().slice(0, 10), a: st.a });
+  setPartCode(KEY, code);
+
+  app.innerHTML =
+    '<div class="hero-badge" aria-hidden="true">📝</div>' +
+    '<div class="step">Part 1 complete!</div>' +
+    '<h2>' + esc(getName()) + ', your code is ready</h2>' +
+    '<p class="muted">Copy this code and send it to your teacher, or move on to the next part.</p>' +
+    '<textarea class="code" id="code" readonly>' + code + '</textarea>' +
+    '<div class="done-actions">' +
+    '<button class="btn" id="cp">Copy code</button>' +
+    '<a href="index.html" class="btn ghost">Back to Hub</a>' +
+    '<a href="part2a.html" class="btn" style="background:var(--accent);color:#fff">Next: Quick Picks I →</a>' +
+    '</div>' +
+    '<p id="msg" class="ok" style="text-align:right;min-height:24px"></p>' +
+    '<div class="row"><button class="btn ghost" id="bkd">← Edit answers</button><span></span></div>';
+
+  document.getElementById("cp").onclick = function () {
+    var m = document.getElementById("msg");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(
+        function () { m.textContent = "Copied!"; },
+        function () { fallbackCopy(); }
+      );
+    } else { fallbackCopy(); }
+    function fallbackCopy() {
+      var ta = document.getElementById("code");
+      ta.focus(); ta.select();
+      try { document.execCommand("copy"); m.textContent = "Copied!"; }
+      catch (e) { m.textContent = "Select the code and copy it manually."; }
+    }
+  };
+
+  document.getElementById("bkd").onclick = function () {
+    st.sec = P1.length - 1; save(); render(); window.scrollTo(0, 0);
+  };
+}
+
+render();
+</script>
+</body>
+</html>

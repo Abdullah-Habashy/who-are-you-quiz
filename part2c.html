@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quick Picks III</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Alexandria:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF1F2;--surface:#FFFFFF;--ink:#4C0519;--muted:#9F1239;--line:#FFE4E6;
+  --accent:#BE123C;--highlight:#06B6D4;--shadow:0 6px 0 #4C0519;
+  color-scheme:light;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#1C0810;--surface:#2D1520;--ink:#FFE4E6;--muted:#FB7185;--line:#4C1525;
+    --accent:#FB7185;--highlight:#22D3EE;--shadow:0 6px 0 #000;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1C0810;--surface:#2D1520;--ink:#FFE4E6;--muted:#FB7185;--line:#4C1525;
+  --accent:#FB7185;--highlight:#22D3EE;--shadow:0 6px 0 #000;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0;
+}
+.wrap{max-width:640px;margin:0 auto;padding:28px 0 48px}
+h1{font-size:clamp(30px,7vw,46px);line-height:1.05;font-weight:800;letter-spacing:-.02em;margin:0 0 14px}
+h2{font-size:24px;line-height:1.15;font-weight:800;margin:0 0 6px;letter-spacing:-.01em}
+p{margin:0 0 14px}
+.muted{color:var(--muted)}
+.step{font-weight:600;color:var(--accent);font-size:15px;margin-bottom:10px}
+button{font:inherit;cursor:pointer;color:inherit}
+.btn{display:inline-block;border:0;border-radius:10px;padding:14px 22px;font-weight:800;font-size:17px;
+  background:var(--ink);color:var(--bg);box-shadow:var(--shadow)}
+.btn.ghost{background:transparent;color:var(--muted);box-shadow:none;padding:14px 8px;font-weight:600}
+.btn:focus-visible,.opt:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--highlight);outline-offset:2px}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:24px}
+.field{margin:0 0 22px}
+label.q{display:block;font-weight:600;margin:0 0 8px}
+textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface);
+  border:2px solid var(--line);border-radius:10px;padding:12px 14px;min-height:84px;resize:vertical}
+.hero-badge{width:110px;height:110px;border-radius:8px;background:var(--accent);border:3px solid var(--ink);box-shadow:var(--shadow);
+  display:grid;place-items:center;font-size:52px;margin:0 0 22px;transform:rotate(-3deg)}
+.card{position:relative;background:var(--surface);border:3px solid var(--ink);border-radius:8px;
+  padding:0;box-shadow:var(--shadow);overflow:hidden;margin:8px 0 0}
+.card-bar{height:4px;background:linear-gradient(90deg,var(--accent),var(--highlight))}
+.card-inner{padding:24px 20px 20px}
+.card .qt{font-size:22px;font-weight:800;line-height:1.2;margin:0 0 18px;letter-spacing:-.01em}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;
+  border:2px solid var(--line);border-left:4px solid transparent;background:var(--bg);
+  border-radius:10px;padding:13px 14px;font-weight:600;font-size:16px;
+  transition:transform .12s ease,background .12s ease}
+.opt .k{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
+  background:var(--surface);border:2px solid var(--line);font-weight:800;font-size:13px}
+.opt:hover{transform:translateX(3px)}
+.opt.sel{background:var(--highlight);border-color:var(--ink);border-left:4px solid var(--accent);color:#fff}
+.opt.sel .k{background:#fff;border-color:var(--ink);color:var(--ink)}
+.tf{grid-template-columns:1fr 1fr}
+.tf .opt{justify-content:center;font-size:19px;padding:18px}
+.card.pop{animation:pop .28s ease}
+@keyframes pop{from{transform:scale(.95);opacity:.5}to{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.card.pop{animation:none}.opt:hover{transform:none}}
+.other{width:100%;font:inherit;font-size:16px;font-weight:600;color:var(--ink);background:var(--bg);
+  border:2px dashed var(--line);border-radius:10px;padding:13px 14px;margin-top:10px}
+.other::placeholder{color:var(--muted);font-weight:400}
+.other.picked{background:var(--highlight);border:2px solid var(--ink);color:#fff}
+.code{width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;min-height:100px;word-break:break-all}
+.ok{color:var(--highlight);font-weight:800}
+.home-btn{position:fixed;top:max(16px,env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px));
+  z-index:100;border:2px solid var(--ink);background:var(--surface);color:var(--ink);border-radius:8px;
+  padding:8px 14px;font-weight:800;font-size:13px;box-shadow:0 3px 0 var(--ink);cursor:pointer;text-decoration:none;display:inline-block}
+.home-btn:hover{transform:translateY(-1px);box-shadow:0 4px 0 var(--ink)}
+</style>
+</head>
+<body>
+<a class="home-btn" href="index.html">⌂ Home</a>
+<main class="wrap" id="app"></main>
+<script src="shared.js"></script>
+<script>
+var PART="2C";
+var KEY="lq_2c";
+var R=P2_RANGES.C;
+var questions=P2.slice(R.s,R.e);
+var COUNT=questions.length;
+var st=getPartState(KEY)||{q:0,b:[],c:{},a:{}};
+var app=document.getElementById("app");
+
+function save(){setPartState(KEY,st);}
+
+function render(){
+  if(st.q==="final")return renderFinal();
+  if(st.q==="done")return renderDone();
+  if(st.q==="intro"||st.q===undefined||typeof st.q!=="number"){st.q=0;save();}
+  if(st.q<0)st.q=0;
+  if(st.q>=COUNT){st.q="final";save();return renderFinal();}
+  renderCard();
+}
+
+function renderCard(){
+  var i=st.q,q=questions[i],chosen=st.b[i],remaining=COUNT-i;
+  var h='<div class="step" style="margin-top:38px">🏁 Quick Picks III &mdash; '+remaining+' remaining</div>';
+  h+='<div class="card pop"><div class="card-bar"></div><div class="card-inner"><div class="qt">'+esc(q.t)+'</div><div class="opts'+(q.tf?' tf':'')+'">';
+  q.o.forEach(function(o,k){
+    h+='<button type="button" class="opt'+(chosen===k?' sel':'')+'" data-k="'+k+'">'+(q.tf?'':'<span class="k" aria-hidden="true">'+String.fromCharCode(65+k)+'</span>')+'<span>'+esc(o[0])+'</span></button>';
+  });
+  h+='</div><input type="text" class="other'+(chosen==="x"?' picked':'')+'" id="oth" placeholder="Something else? Type it and press Enter" value="'+esc(chosen==="x"?(st.c[i]||""):"")+'">';
+  h+='</div></div>';
+  h+='<div class="row"><button class="btn ghost" id="bk">Back</button><span></span></div>';
+  app.innerHTML=h;
+  var lock=false;
+  app.querySelectorAll(".opt").forEach(function(b){b.onclick=function(){
+    if(lock)return;lock=true;
+    st.b[i]=+b.dataset.k;delete st.c[i];save();
+    app.querySelectorAll(".opt").forEach(function(x){x.classList.toggle("sel",x===b);});
+    setTimeout(function(){st.q++;save();render();window.scrollTo(0,0);},260);
+  };});
+  var oth=document.getElementById("oth");
+  if(oth)oth.onkeydown=function(e){
+    if(e.key!=="Enter"||e.isComposing)return;e.preventDefault();
+    var v=this.value.trim();if(!v||lock)return;lock=true;
+    st.b[i]="x";st.c[i]=v;save();this.classList.add("picked");
+    app.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel");});
+    setTimeout(function(){st.q++;save();render();window.scrollTo(0,0);},260);
+  };
+  document.getElementById("bk").onclick=function(){
+    if(st.q>0){st.q--;save();render();}
+    else{st.q="intro";save();render();}
+    window.scrollTo(0,0);
+  };
+}
+
+function renderFinal(){
+  var h='<div class="step" style="margin-top:38px">🏁 Last two, both optional</div>';
+  h+='<h2>Almost done</h2><div style="margin-top:20px">';
+  FINAL.forEach(function(q){
+    h+='<div class="field"><label class="q" for="'+q.id+'">'+esc(q.t)+'</label><textarea id="'+q.id+'" data-id="'+q.id+'">'+esc(st.a[q.id]||"")+'</textarea></div>';
+  });
+  h+='</div><div class="row"><button class="btn ghost" id="bk">Back</button><button class="btn" id="nx">See my result</button></div>';
+  app.innerHTML=h;
+  app.querySelectorAll("textarea").forEach(function(t){t.oninput=function(){st.a[t.dataset.id]=t.value;save();};});
+  document.getElementById("bk").onclick=function(){st.q=COUNT-1;save();render();window.scrollTo(0,0);};
+  document.getElementById("nx").onclick=function(){st.q="done";save();render();window.scrollTo(0,0);};
+}
+
+function renderDone(){
+  var code=encodePart("LQ2C",{v:2,n:getName(),d:new Date().toISOString().slice(0,10),off:R.s,b:st.b,c:st.c,a:st.a});
+  setPartCode(KEY,code);
+  app.innerHTML='<div class="hero-badge" aria-hidden="true">🏁</div>'+
+  '<h1>You’re all done! 🎉</h1>'+
+  '<p class="muted">That was the last round. Copy your code and send it to your teacher.</p>'+
+  '<textarea class="code" id="code" readonly>'+code+'</textarea>'+
+  '<div class="row"><button class="btn ghost" id="again">Redo this part</button><button class="btn" id="cp">Copy code</button></div>'+
+  '<p id="msg" class="ok" style="text-align:right;min-height:24px"></p>'+
+  '<div class="row"><a href="index.html" class="btn" style="text-decoration:none;text-align:center;width:100%">Back to Hub</a></div>';
+  document.getElementById("cp").onclick=function(){
+    var ta=document.getElementById("code"),m=document.getElementById("msg");
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(code).then(function(){m.textContent="Copied!";},function(){ta.focus();ta.select();try{document.execCommand("copy");m.textContent="Copied!";}catch(e){m.textContent="Select the code and copy it";}});
+    }else{ta.focus();ta.select();try{document.execCommand("copy");m.textContent="Copied!";}catch(e){m.textContent="Select the code and copy it";}}
+  };
+  document.getElementById("again").onclick=function(){
+    st={q:0,b:[],c:{},a:{}};save();setPartCode(KEY,"");render();window.scrollTo(0,0);
+  };
+}
+
+if(!getName()){
+  app.innerHTML='<div class="hero-badge" aria-hidden="true">🏁</div><h1>Quick Picks III</h1>'+
+  '<p class="muted">Last round &mdash; finish strong!</p>'+
+  '<p class="muted">Please start from the <a href="index.html">hub page</a> to enter your name first.</p>';
+}else if(st.q==="intro"||st.q===undefined){
+  app.innerHTML='<div class="hero-badge" aria-hidden="true">🏁</div><h1>Quick Picks III</h1>'+
+  '<p class="muted">Last round &mdash; finish strong! Just tap and go.</p>'+
+  '<div class="row"><span></span><button class="btn" id="go">Let’s go</button></div>';
+  document.getElementById("go").onclick=function(){st.q=0;save();render();window.scrollTo(0,0);};
+}else{
+  render();
+}
+</script>
+</body>
+</html>

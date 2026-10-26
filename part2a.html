@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quick Picks I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Alexandria:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F0FDF9;--surface:#FFFFFF;--ink:#134E4A;--muted:#5F8F8A;--line:#CCFBF1;
+  --accent:#0F766E;--highlight:#FBBF24;--accent-soft:#D1FAE5;
+  --shadow:0 6px 0 #134E4A;
+  color-scheme:light;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1F1D;--surface:#1A3330;--ink:#CCFBF1;--muted:#8CB8B3;--line:#264D48;
+    --accent:#5EEAD4;--highlight:#FBBF24;--accent-soft:#1A3330;
+    --shadow:0 6px 0 #000;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1F1D;--surface:#1A3330;--ink:#CCFBF1;--muted:#8CB8B3;--line:#264D48;
+  --accent:#5EEAD4;--highlight:#FBBF24;--accent-soft:#1A3330;
+  --shadow:0 6px 0 #000;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0;
+}
+.wrap{max-width:640px;margin:0 auto;padding:28px 0 48px}
+h1{font-size:clamp(32px,8vw,48px);line-height:1.05;font-weight:800;letter-spacing:-.02em;margin:0 0 14px}
+p{margin:0 0 14px}
+.muted{color:var(--muted)}
+.step{font-weight:600;color:var(--accent);font-size:15px;margin-bottom:10px}
+
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:0 0 22px}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s ease}
+
+button{font:inherit;cursor:pointer;color:inherit}
+.btn{display:inline-block;border:0;border-radius:14px;padding:14px 22px;font-weight:800;font-size:17px;
+  background:var(--ink);color:var(--bg);box-shadow:var(--shadow)}
+.btn.ghost{background:transparent;color:var(--muted);box-shadow:none;padding:14px 8px;font-weight:600}
+.btn:focus-visible,.opt:focus-visible{outline:3px solid var(--highlight);outline-offset:2px}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:24px}
+
+.home{position:fixed;top:max(14px,env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px));
+  z-index:100;background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:6px 14px;
+  font-weight:700;font-size:14px;text-decoration:none;color:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.08)}
+
+.deck{position:relative;margin:8px 0 0}
+.deck::before,.deck::after{content:"";position:absolute;left:14px;right:14px;height:100%;border-radius:20px;background:var(--surface);border:2px solid var(--line)}
+.deck::before{top:16px;transform:rotate(-2.2deg);opacity:.55}
+.deck::after{top:8px;transform:rotate(1.4deg);opacity:.8}
+.card{position:relative;z-index:1;background:var(--surface);border:3px solid var(--accent);border-radius:20px;padding:26px 22px 22px;box-shadow:var(--shadow)}
+.card .qt{font-size:22px;font-weight:800;line-height:1.2;margin:0 0 20px;letter-spacing:-.01em}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;border:2px solid var(--line);background:var(--bg);
+  border-radius:14px;padding:13px 14px;font-weight:600;font-size:16px;transition:transform .12s ease,background .12s ease}
+.opt .k{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--surface);border:2px solid var(--line);font-weight:800;font-size:14px}
+.opt:hover{transform:translateX(3px)}
+.opt.sel{background:var(--highlight);border-color:var(--ink);color:#134E4A}
+.opt.sel .k{background:#fff;border-color:#134E4A;color:#134E4A}
+.tf{grid-template-columns:1fr 1fr}
+.tf .opt{justify-content:center;font-size:19px;padding:18px}
+.card.flip{animation:flip .28s ease}
+@keyframes flip{from{transform:translateY(10px) rotate(1deg);opacity:.2}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.card.flip{animation:none}.opt:hover{transform:none}.bar>i{transition:none}}
+
+.other{width:100%;font:inherit;font-size:16px;font-weight:600;color:var(--ink);background:var(--bg);
+  border:2px dashed var(--line);border-radius:14px;padding:13px 14px;margin-top:10px}
+.other::placeholder{color:var(--muted);font-weight:400}
+.other.picked{background:var(--highlight);border:2px solid var(--ink);color:#134E4A}
+
+.hero-badge{width:110px;height:110px;border-radius:28px;background:var(--accent);border:3px solid var(--ink);box-shadow:var(--shadow);
+  display:grid;place-items:center;font-size:52px;margin:0 0 22px;transform:rotate(-4deg)}
+
+.code{width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;min-height:100px;word-break:break-all;
+  background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:12px 14px;resize:vertical}
+.ok{color:var(--accent);font-weight:800}
+.link{color:var(--accent);font-weight:700;text-decoration:none}
+.link:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<a class="home" href="index.html">← Home</a>
+<main class="wrap" id="app" aria-live="polite"></main>
+<script src="shared.js"></script>
+<script>
+var PART_KEY="lq_2a";
+var RANGE=P2_RANGES.A;
+var COUNT=RANGE.e-RANGE.s;
+var questions=P2.slice(RANGE.s,RANGE.e);
+
+var st=getPartState(PART_KEY)||{q:0,b:[],c:{}};
+if(!st.c)st.c={};
+var screen=st.done?"done":"quiz";
+var app=document.getElementById("app");
+
+function save(){setPartState(PART_KEY,st);}
+
+function render(){
+  if(screen==="intro")renderIntro();
+  else if(screen==="done")renderDone();
+  else renderQuiz();
+}
+
+function renderIntro(){
+  app.innerHTML='<div class="hero-badge" aria-hidden="true">⚡</div>'+
+  '<h1>Quick Picks I</h1>'+
+  '<p class="muted">Just tap whatever feels right. Don’t overthink it. Your first pick is usually the real one.</p>'+
+  '<p class="muted">'+COUNT+' quick questions.</p>'+
+  '<div class="row"><span></span><button class="btn" id="go">I’m ready</button></div>';
+  document.getElementById("go").onclick=function(){screen="quiz";render();window.scrollTo(0,0);};
+}
+
+function renderQuiz(){
+  var i=st.q;
+  if(i>=COUNT){screen="done";st.done=true;save();render();return;}
+  var q=questions[i],chosen=st.b[i],h='';
+  h+='<div class="step">Quick picks I, '+(i+1)+' of '+COUNT+'</div>';
+  h+='<div class="bar"><i style="width:'+(i/COUNT*100)+'%"></i></div>';
+  h+='<div class="deck"><div class="card flip"><div class="qt">'+esc(q.t)+'</div><div class="opts'+(q.tf?' tf':'')+'">';
+  q.o.forEach(function(o,k){
+    h+='<button type="button" class="opt'+(chosen===k?' sel':'')+'" data-k="'+k+'">'+(q.tf?'':'<span class="k" aria-hidden="true">'+String.fromCharCode(65+k)+'</span>')+'<span>'+esc(o[0])+'</span></button>';
+  });
+  h+='</div><input type="text" class="other'+(chosen==="x"?' picked':'')+'" id="oth" aria-label="Something else" placeholder="Something else? Type it and press Enter" value="'+esc(chosen==="x"?(st.c[i]||""):"")+'">';
+  h+='</div></div>';
+  h+='<div class="row"><button class="btn ghost" id="bk">Back</button><span></span></div>';
+  app.innerHTML=h;
+
+  var lock=false;
+  app.querySelectorAll(".opt").forEach(function(b){b.onclick=function(){
+    if(lock)return;lock=true;
+    st.b[i]=+b.dataset.k;delete st.c[i];save();
+    app.querySelectorAll(".opt").forEach(function(x){x.classList.toggle("sel",x===b);});
+    setTimeout(function(){st.q=i+1;save();render();window.scrollTo(0,0);},260);
+  };});
+
+  var oth=document.getElementById("oth");
+  if(oth)oth.onkeydown=function(e){
+    if(e.key!=="Enter"||e.isComposing)return;e.preventDefault();
+    var v=this.value.trim();if(!v||lock)return;lock=true;
+    st.b[i]="x";st.c[i]=v;save();this.classList.add("picked");
+    app.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel");});
+    setTimeout(function(){st.q=i+1;save();render();window.scrollTo(0,0);},260);
+  };
+
+  document.getElementById("bk").onclick=function(){
+    if(st.q>0){st.q--;save();render();}
+    else{screen="intro";render();}
+    window.scrollTo(0,0);
+  };
+}
+
+function renderDone(){
+  var code=encodePart("LQ2A",{v:2,n:getName(),d:new Date().toISOString().slice(0,10),off:RANGE.s,b:st.b,c:st.c});
+  setPartCode(PART_KEY,code);
+  app.innerHTML='<div class="hero-badge" aria-hidden="true">✅</div>'+
+  '<h1>Part done!</h1>'+
+  '<p class="muted">Copy this code and send it to your teacher, or keep going to the next part.</p>'+
+  '<textarea class="code" id="code" readonly>'+code+'</textarea>'+
+  '<div class="row"><button class="btn ghost" id="cp">Copy code</button><a class="btn" href="part2b.html">Next: Quick Picks II →</a></div>'+
+  '<p id="msg" class="ok" style="text-align:left;min-height:24px"></p>'+
+  '<div style="margin-top:16px"><a class="link" href="index.html">← Back to hub</a></div>'+
+  '<div style="margin-top:12px"><button class="btn ghost" id="again" style="padding-left:0">Start this part over</button></div>';
+
+  document.getElementById("cp").onclick=function(){
+    var m=document.getElementById("msg");
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(code).then(function(){m.textContent="Copied!";},function(){fallbackCopy(m);});
+    }else fallbackCopy(m);
+  };
+  function fallbackCopy(m){
+    var ta=document.getElementById("code");ta.focus();ta.select();
+    try{document.execCommand("copy");m.textContent="Copied!";}catch(e){m.textContent="Select the code and copy it manually.";}
+  }
+  document.getElementById("again").onclick=function(){
+    st={q:0,b:[],c:{}};screen="quiz";save();render();window.scrollTo(0,0);
+  };
+}
+
+if(st.b&&st.b.length>0&&!st.done)screen="quiz";
+else if(st.done)screen="done";
+else screen="intro";
+render();
+</script>
+</body>
+</html>
