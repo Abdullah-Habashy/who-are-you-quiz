@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>صفحة المعلم: تحليل لعبة التعارف</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Alexandria:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F2FF; --surface:#FFFFFF; --ink:#1E2140; --muted:#5D6088; --line:#DCDAF5;
+  --sun:#F5B83D; --teal:#1F9E91; --coral:#E9505A; --violet:#5B4BDB; --violet-soft:#E7E4FF;
+  --shadow:0 2px 0 rgba(30,33,64,.12);
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14162A; --surface:#1F2240; --ink:#EEECFF; --muted:#A6A8CC; --line:#34386A;
+    --sun:#F5C25A; --teal:#3CC2B3; --coral:#FF6F77; --violet:#9C90FF; --violet-soft:#2C2D5C;
+    --shadow:0 2px 0 rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14162A; --surface:#1F2240; --ink:#EEECFF; --muted:#A6A8CC; --line:#34386A;
+  --sun:#F5C25A; --teal:#3CC2B3; --coral:#FF6F77; --violet:#9C90FF; --violet-soft:#2C2D5C;
+  --shadow:0 2px 0 rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:640px;margin:0 auto;padding:28px 20px 48px}
+h1{font-size:clamp(34px,8vw,52px);line-height:1.02;font-weight:800;letter-spacing:-.02em;margin:0 0 14px}
+h2{font-size:26px;line-height:1.15;font-weight:800;margin:0 0 6px;letter-spacing:-.01em}
+p{margin:0 0 14px}
+.muted{color:var(--muted)}
+.step{font-weight:600;color:var(--violet);font-size:15px;margin-bottom:10px}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:0 0 22px}
+.bar > i{display:block;height:100%;background:var(--violet);border-radius:99px;transition:width .3s ease}
+button{font:inherit;cursor:pointer;color:inherit}
+.btn{display:inline-block;border:0;border-radius:14px;padding:14px 22px;font-weight:800;font-size:17px;
+  background:var(--ink);color:var(--bg);box-shadow:var(--shadow)}
+.btn.ghost{background:transparent;color:var(--muted);box-shadow:none;padding:14px 8px;font-weight:600}
+.btn:focus-visible,.opt:focus-visible,.chip:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:24px}
+label.q{display:block;font-weight:600;margin:0 0 8px}
+.field{margin:0 0 22px}
+input[type=text],textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface);
+  border:2px solid var(--line);border-radius:12px;padding:12px 14px}
+textarea{min-height:84px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:var(--surface);border-radius:99px;padding:8px 14px;font-weight:600;font-size:15px}
+.chip[aria-pressed="true"]{background:var(--violet);border-color:var(--violet);color:#fff}
+/* the deck */
+.deck{position:relative;margin:8px 0 0}
+.deck::before,.deck::after{content:"";position:absolute;left:14px;right:14px;height:100%;border-radius:24px;background:var(--surface);border:2px solid var(--line)}
+.deck::before{top:16px;transform:rotate(-2.2deg);opacity:.55}
+.deck::after{top:8px;transform:rotate(1.4deg);opacity:.8}
+.card{position:relative;z-index:1;background:var(--surface);border:2px solid var(--ink);border-radius:24px;padding:26px 22px 22px;box-shadow:0 6px 0 var(--ink)}
+.card .qt{font-size:23px;font-weight:800;line-height:1.2;margin:0 0 20px;letter-spacing:-.01em}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;border:2px solid var(--line);background:var(--bg);
+  border-radius:14px;padding:13px 14px;font-weight:600;font-size:16px;transition:transform .12s ease,background .12s ease}
+.opt .k{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--surface);border:2px solid var(--line);font-weight:800;font-size:14px}
+.opt:hover{transform:translateX(3px)}
+.opt.sel{background:var(--sun);border-color:var(--ink);color:#1E2140}
+.opt.sel .k{background:#fff;border-color:#1E2140;color:#1E2140}
+.tf{grid-template-columns:1fr 1fr}
+.tf .opt{justify-content:center;font-size:19px;padding:18px}
+.card.flip{animation:flip .28s ease}
+@keyframes flip{from{transform:translateY(10px) rotate(1deg);opacity:.2}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.card.flip{animation:none}.opt:hover{transform:none}.bar>i{transition:none}}
+.hero-badge{width:120px;height:120px;border-radius:30px;background:var(--sun);border:3px solid var(--ink);box-shadow:0 6px 0 var(--ink);
+  display:grid;place-items:center;font-size:58px;margin:0 0 22px;transform:rotate(-4deg)}
+.code{width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;min-height:110px;word-break:break-all}
+.note{background:var(--violet-soft);border-radius:14px;padding:14px 16px;font-size:15px;margin:16px 0}
+.ok{color:var(--teal);font-weight:800}
+/* teacher view (Arabic) */
+.ar{direction:rtl;text-align:right;font-family:"Alexandria",Tahoma,"Segoe UI",sans-serif;line-height:1.85}
+.ar h1{font-size:30px;line-height:1.3}
+.ar h2{font-size:21px;margin-top:30px}
+.ar .en{direction:ltr;text-align:left;font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.5;margin:4px 0}
+.tabs{display:flex;gap:8px;margin:8px 0 20px}
+.tab{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 16px;font-weight:600;font-family:inherit}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.lens{margin:0 0 12px}
+.lens .t{display:flex;justify-content:space-between;font-weight:600;font-size:15px}
+.lens .b{height:12px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:4px}
+.lens .b i{display:block;height:100%;background:var(--teal);border-radius:99px}
+.lens.top .b i{background:var(--violet)}
+.box{background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:16px 18px;margin:0 0 14px}
+.box.flag{border-color:var(--coral)}
+.box h3{margin:0 0 6px;font-size:17px}
+.item{border-bottom:1px solid var(--line);padding:12px 0}
+.item:last-child{border-bottom:0}
+.item .p{color:var(--muted);font-size:14px}
+.ans{font-weight:800}
+.tag{display:inline-block;font-size:12px;border-radius:8px;padding:2px 8px;background:var(--violet-soft);margin-inline-start:6px}
+.tag.c{background:var(--coral);color:#fff}
+.hidden{display:none}
+.other{width:100%;font:inherit;font-size:16px;font-weight:600;color:var(--ink);background:var(--bg);border:2px dashed var(--line);border-radius:14px;padding:13px 14px;margin-top:10px}
+.other::placeholder{color:var(--muted);font-weight:400}
+.other.picked{background:var(--sun);border:2px solid var(--ink);color:#1E2140}
+.chips + .other{border-radius:99px;padding:8px 16px;font-size:15px}
+.pdfmode{--bg:#fff;--surface:#fff;--ink:#1E2140;--muted:#5D6088;--line:#DCDAF5;--teal:#1F9E91;--coral:#E9505A;--violet:#5B4BDB;--violet-soft:#E7E4FF;color:#1E2140;background:#fff;font-size:16px;letter-spacing:0}
+.pdfmode *{letter-spacing:0!important}
+</style>
+</head>
+<body>
+<main class="wrap" id="app" aria-live="polite"></main>
+
+<script>
+/* ---------------- data ---------------- */
+var LENS = {
+  S:{en:"The Time Traveler",emoji:"⏳",ar:"القصة والسيرة",
+     blurb:"You’re pulled in by a good story. Real journeys, real people, and how it all turned out.",
+     tip:"ابدأ الموضوع بقصة من السيرة أو قصص الأنبياء، واحكيها كمشهد فيه تشويق، وخلّي الدرس يطلع من القصة.",
+     ex:"الهجرة كرحلة هروب ونجاة، قصة يوسف عليه السلام من البئر للعرش، غزوة الخندق كقصة تخطيط وصبر."},
+  H:{en:"The Champion",emoji:"🏆",ar:"الأبطال والشخصيات",
+     blurb:"You notice the people who step up when it counts, and you remember what made them great.",
+     tip:"قدّم الصحابة والأنبياء كأبطال حقيقيين، وقارنهم بالأبطال اللي بيحبهم في الرياضة أو الألعاب أو الأفلام.",
+     ex:"خالد بن الوليد القائد اللي ما اتهزمش، ثبات بلال، شجاعة علي يوم الهجرة، مصعب بن عمير."},
+  C:{en:"The Stargazer",emoji:"🔭",ar:"العلم والكون",
+     blurb:"You want to know how things really work, from tiny cells to giant galaxies.",
+     tip:"ابدأ من آية كونية أو معلومة علمية مدهشة، ووصّلها للعقيدة والتفكر في عظمة الخالق.",
+     ex:"آيات خلق السماوات والأرض، دقة الكون في سورة الملك، جسم الإنسان وحكمة الوضوء والصيام."},
+  Q:{en:"The Thinker",emoji:"🧠",ar:"الأسئلة الكبيرة والنقاش",
+     blurb:"You don’t just accept things. You ask the questions most people skip.",
+     tip:"ابدأ بسؤال مفتوح، واسمع رأيه قبل ما تقول الإجابة، وادّيله أدلة عقلية يقتنع بيها.",
+     ex:"ليه خلقنا ربنا؟ ليه في شر في الدنيا؟ إزاي نعرف إن القرآن من عند الله؟"},
+  G:{en:"The Strategist",emoji:"🎯",ar:"التحدي واللعب",
+     blurb:"Give you a challenge and a clock, and you’re in. You like to win, and you like to figure things out.",
+     tip:"حوّل المحتوى لمسابقات وألغاز ونقاط وتحديات بوقت، والشرح يكون جوه اللعبة مش قبلها.",
+     ex:"اعرف الصحابي من ٣ تلميحات، رتّب أحداث السيرة ضد الوقت، تحدي الأذكار والأدعية."},
+  P:{en:"The Navigator",emoji:"🧭",ar:"التطبيق في حياته",
+     blurb:"You care about what actually works in real life: with friends, at school, out in the world.",
+     tip:"ابدأ من موقف من حياته اليومية في المدرسة والأصحاب والنت، وبعدين اعرض الحل والتوجيه من الدين.",
+     ex:"أخلاق التعامل مع الأصحاب، الأمانة في الامتحانات، أذكار ومواقف اليوم، التعامل مع الغضب."},
+  M:{en:"The Maker",emoji:"🛠️",ar:"الإبداع والصناعة",
+     blurb:"You learn by building. Give you a blank page and you’ll make something worth showing.",
+     tip:"خليه يصنع حاجة بنفسه في كل موضوع: رسمة، كوميك، فيديو قصير، خريطة، أو عرض.",
+     ex:"يرسم خريطة الهجرة، يعمل بوستر لحديث، يكتب كوميك عن قصة نبي، يصمم بطاقة ذكر."}
+};
+var LORDER = ["S","H","C","Q","G","P","M"];
+
+var P1 = [
+ {sec:"Sports and activities",ar:"الرياضة والأنشطة",qs:[
+  {id:"a1",t:"What sports or activities do you do in your free time?",ar:"الرياضات والأنشطة اللي بيمارسها",type:"text"},
+  {id:"a2",t:"Do you mostly play sports, or watch them?",ar:"بيلعب ولا بيتفرج؟",type:"one",opts:["I play","I watch","Both","Neither, not my thing"]},
+  {id:"a3",t:"Which team do you support? Any sport counts.",ar:"بيشجع أنهي فريق",type:"text"},
+  {id:"a4",t:"Who’s your favorite player or athlete, and what do you like about them?",ar:"لاعبه المفضل وليه",type:"text"},
+  {id:"a5",t:"Any other hobbies? Drawing, cooking, coding, building, music, anything.",ar:"هوايات تانية",type:"text"},
+  {id:"a6",t:"What’s something you’re really good at, or taught yourself?",ar:"حاجة بيعرف يعملها كويس أو علّمها لنفسه",type:"text"}]},
+ {sec:"Games",ar:"الألعاب",qs:[
+  {id:"g1",t:"Which games do you play? List as many as you like.",ar:"أسماء الألعاب اللي بيلعبها",type:"text"},
+  {id:"g2",t:"What’s your all-time favorite game?",ar:"لعبته المفضلة",type:"text"},
+  {id:"g3",t:"Who do you usually play with?",ar:"بيلعب مع مين",type:"many",opts:["Alone","Friends online","Friends in person","My brother or sister","Family"]},
+  {id:"g4",t:"Which game do you spend the most hours on?",ar:"اللعبة اللي بياخد فيها أكتر وقت",type:"text"},
+  {id:"g5",t:"What do you love most in a game?",ar:"أكتر حاجة بيحبها في اللعب",type:"many",opts:["Winning and competing","The story","Building and creating","Exploring the world","Playing with friends","Strategy and planning"]}]},
+ {sec:"Shows, movies, and anime",ar:"المسلسلات والأفلام والأنمي",qs:[
+  {id:"s1",t:"Name 3 or 4 series you love.",ar:"٣ أو ٤ مسلسلات بيحبها",type:"text"},
+  {id:"s2",t:"Name 3 or 4 movies you love.",ar:"٣ أو ٤ أفلام بيحبها",type:"text"},
+  {id:"s3",t:"Any anime? Name 3 or 4, or skip this one.",ar:"٣ أو ٤ أنمي",type:"text"},
+  {id:"s4",t:"Your favorite character from any of them, and why?",ar:"شخصيته المفضلة وليه",type:"text"},
+  {id:"s5",t:"A scene that really stuck with you or moved you. What happened?",ar:"لقطة أثّرت فيه",type:"text"},
+  {id:"s6",t:"What kind of stuff do you go for most?",ar:"الأنواع اللي بيفضلها",type:"many",opts:["Action","Comedy","Mystery","Sci-fi","Fantasy","Drama","Sports","Documentary","Horror"]}]},
+ {sec:"Online and free time",ar:"النت ووقت الفراغ",qs:[
+  {id:"o1",t:"What do you watch most on YouTube or TikTok?",ar:"بيتفرج على إيه على يوتيوب وتيك توك",type:"many",opts:["Gaming","Sports","Science and tech","Comedy","How-to and DIY","Anime edits","History","Cars","Music","Vlogs"]},
+  {id:"o2",t:"Any favorite YouTuber or creator?",ar:"صانع محتوى مفضل",type:"text"},
+  {id:"o3",t:"Walk me through a normal day off, from waking up to going to sleep.",ar:"يوم إجازة عادي من الصحيان للنوم",type:"text"},
+  {id:"o4",t:"What do you usually listen to?",ar:"بيسمع إيه عادة",type:"many",opts:["Music","Podcasts","Quran or nasheeds","Audiobooks","Not much"]},
+  {id:"o5",t:"A free Saturday and unlimited money. What do you do?",ar:"يوم سبت فاضي وفلوس بلا حدود، هيعمل إيه",type:"text"}]}
+];
+
+var TF=["True","False"];
+var P2 = [
+ {t:"Would you rather…",ar:"يكشف الميل للقصص والأبطال الحقيقيين مقابل التحدي والألغاز.",
+  o:[["Watch a movie about a real-life hero",{H:2,S:1}],["Play a game where you solve a mystery",{G:2,Q:1}]]},
+ {t:"Pick a superpower.",ar:"يكشف القيم والاهتمام: التاريخ، أو المعرفة، أو البطولة، أو الناس، أو الإبداع.",
+  o:[["Time travel",{S:2}],["Knowing the answer to any question",{Q:2,C:1}],["Super strength",{H:2,G:1}],["Reading minds",{P:2}],["Creating anything you imagine",{M:2}]]},
+ {t:"Pizza or burger?",decoy:1,o:[["Pizza",{}],["Burger",{}],["Both, please",{}]]},
+ {t:"Your friend says: “Religion is just a list of rules.” What’s closest to your reaction?",ar:"يقيس موقفه الحقيقي من الدين بشكل غير مباشر، وهل محتاج إقناع.",
+  o:[["Kind of true, honestly",{att:-2},"شايف الدين قواعد وبس. ركّز على المعنى والرحمة والهدف قبل الأحكام."],["Rules are fine if someone explains why",{W:2}],["No, there’s more to it than that",{att:2,E:1}],["I never really thought about it",{}]]},
+ {t:"“I like knowing the why behind things before I do them.”",tf:1,ar:"هل يحتاج يعرف الحكمة قبل الحكم.",
+  o:[["Of course",{W:2,Q:1}],["I don’t think so",{P:1}]]},
+ {t:"A character is lost in the desert at night. Pick the ending you like best.",ar:"يكشف الميل للعلم والكون، أو العلاقات والأخلاق، أو المغامرة، أو التأمل الداخلي.",
+  o:[["He finds his way using the stars",{C:2}],["A stranger shows up and helps him",{P:2}],["He stumbles on a hidden treasure",{G:2}],["He learns something about himself",{Q:1,E:2}]]},
+ {t:"How long can you watch a video before you skip it?",ar:"يحدد الطول المناسب لكل جزء في الحصة.",
+  o:[["Under a minute",{span:1}],["2 to 5 minutes",{span:2}],["10 minutes or more, if it’s good",{span:3}]]},
+ {t:"You get a new game. What do you do first?",ar:"يكشف طريقته في التعلم: تجربة، أو مشاهدة، أو قراءة، أو مع حد.",
+  o:[["Jump in and figure it out",{G:2,P:1}],["Watch someone else play it",{H:1,S:1}],["Read the guide or wiki",{C:1,W:1}],["Ask a friend to teach me",{soc:1}]]},
+ {t:"Cats or dogs?",decoy:1,o:[["Cats",{}],["Dogs",{}],["Neither",{}]]},
+ {t:"In a group project, you’re usually the one who…",ar:"يكشف دوره الطبيعي في المجموعة ومدى مشاركته.",
+  o:[["Takes charge",{H:1,cmp:1}],["Comes up with the ideas",{M:2}],["Makes it look good",{M:1}],["Does the research",{C:2,W:1}],["Keeps everyone getting along",{P:2,soc:1}],["Lets the others handle it",{},"صريح إنه بيسيب الشغل لغيره. محتاج مهام صغيرة وواضحة ومسؤولية محددة في كل حصة."]]},
+ {t:"“I get bored when someone talks for more than five minutes.”",tf:1,ar:"يؤكد قدرته على متابعة الشرح الطويل.",
+  o:[["True",{spanAdj:-1}],["False",{}]]},
+ {t:"You can only visit one room in a museum. Which one?",ar:"يكشف المجال الأقرب لاهتمامه.",
+  o:[["Dinosaurs and outer space",{C:2}],["Ancient kingdoms and great battles",{S:2,H:1}],["Inventions you can touch and try",{M:2,G:1}],["Stories of famous people",{H:2}],["Unsolved mysteries",{Q:2,G:1}]]},
+ {t:"A teacher asks a hard question nobody knows. You…",ar:"يكشف المنافسة، أو التفكير، أو الانسحاب، أو الحاجة للحكمة.",
+  o:[["Guess anyway. A win is a win",{G:2,cmp:1}],["Think it through quietly",{Q:2}],["Wait for someone else to answer",{}],["Ask why the question even matters",{W:2}]]},
+ {t:"“Sometimes I wonder what the point of life is.”",tf:1,ar:"يكشف انشغاله بسؤال الغاية من الحياة.",
+  o:[["True",{Q:2},"بيفكر في معنى الحياة. موضوع الغاية من الخلق هيلمسه جداً."],["False",{P:1}]]},
+ {t:"Pick a book by its cover.",ar:"يكشف المدخل المفضل: مغامرة، أو كون، أو ألغاز، أو حياة عملية، أو إبداع.",
+  o:[["A ship in a huge storm",{S:2}],["A galaxy full of stars",{C:2}],["A maze seen from above",{G:2}],["A notebook called “How to Handle Anything”",{P:2}],["A blank sketchbook",{M:2}]]},
+ {t:"What’s the best part of a good movie?",ar:"يكشف إيه اللي بيشده في أي قصة.",
+  o:[["The plot twist",{Q:1,G:1}],["The hero’s comeback",{H:2}],["The friendship",{P:2,soc:1}],["The world and the visuals",{C:1,M:1}],["The funny moments",{}]]},
+ {t:"Morning person or night owl?",decoy:1,o:[["Morning person",{}],["Night owl",{}],["Depends on the day",{}]]},
+ {t:"Someone at school says: “Muslims are way too strict.” You’d most likely…",ar:"يكشف اعتزازه بهويته، وهل عنده إجابات يدافع بيها.",
+  o:[["Explain what I know, calmly",{att:1,W:1}],["Change the subject",{},"بيتهرب من الموضوع. ممكن يكون محرج من دينه قدام أصحابه، فاشتغل على اعتزازه بهويته بهدوء."],["Kind of agree, a little",{att:-1},"متأثر جزئياً بفكرة إن الإسلام متشدد. محتاج يسر وأمثلة من رحمة النبي ﷺ."],["Not be sure what to say",{Q:1},"مش عارف يرد لما حد ينتقد دينه. محتاج إجابات بسيطة يقدر يقولها لأصحابه."]]},
+ {t:"“I’d rather do something with my hands than listen to someone explain it.”",tf:1,ar:"يكشف هل بيتعلم بالعمل والصناعة أكتر من الاستماع.",
+  o:[["True",{M:2,P:1}],["False",{S:1}]]},
+ {t:"Pick a reward.",ar:"يكشف الحافز الأقوى عنده.",
+  o:[["Points and a spot on the leaderboard",{G:2,cmp:1}],["A mind-blowing fact",{C:2}],["A great story to tell my friends",{S:2}],["A skill I can actually use",{P:2}],["Making something I can show off",{M:2}]]},
+ {t:"Some people say they feel calm after praying. Have you felt that?",ar:"يقيس الأثر الروحي للعبادة عنده.",
+  o:[["Yes, often",{att:2,E:2}],["Sometimes",{att:1,E:1}],["Not really",{att:-1},"مش حاسس بأثر روحي للعبادة لسه. ابدأ بمعنى الصلاة ومشاعرها قبل أحكامها."],["Never thought about it",{}]]},
+ {t:"You can follow only one person online. Who?",ar:"يكشف نوع القدوة اللي بيشده.",
+  o:[["An astronaut",{C:2}],["A top athlete",{H:2,G:1}],["A world traveler",{S:1,C:1}],["An inventor or builder",{M:2}],["Someone who helps people in need",{P:2,E:1}]]},
+ {t:"Sweet or salty?",decoy:1,o:[["Sweet",{}],["Salty",{}],["Spicy",{}]]},
+ {t:"When things get tough, what helps you most?",ar:"يكشف المدخل الأنسب لموضوعات الصبر والتوكل والأخلاق.",
+  o:[["Hearing about someone who went through the same",{S:2,H:1}],["A clear step-by-step plan",{P:2}],["Talking to someone I trust",{soc:1,E:1}],["Figuring out why it happened",{Q:2,W:1}],["Taking my mind off it with a game",{G:1}]]},
+ {t:"“I enjoy a good debate, even if I lose.”",tf:1,ar:"يكشف هل النقاش أسلوب مناسب له.",
+  o:[["True",{Q:2,cmp:1}],["False",{}]]},
+ {t:"A kid finds an old map in the attic. What happens next?",ar:"يكشف الميل للمغامرة، أو الجماعة، أو البحث، أو الإبداع، أو الجذور والتاريخ.",
+  o:[["He follows it alone",{G:1}],["He brings his friends along",{soc:1,P:1}],["He researches where it came from",{C:1,W:1}],["He draws his own map",{M:2}],["It belonged to his great-grandfather",{S:2}]]},
+ {t:"“Stories from history feel far away. They’re not really about me.”",tf:1,ar:"يقيس مدى تقبّله للسيرة والتاريخ.",
+  o:[["True",{S:-2},"التاريخ بعيد عنه. لو هتحكي سيرة، اربطها الأول بموقف من حياته الحالية."],["False",{S:2}]]},
+ {t:"Choose your challenge.",ar:"يكشف نوع النشاط اللي هيتحمس له.",
+  o:[["Memorize 10 things in one minute",{G:2}],["Build a bridge out of paper",{M:2}],["Solve a tricky riddle",{Q:2}],["Guess a famous person from clues",{H:1,G:1}],["Plan the perfect trip",{P:2}]]},
+ {t:"Your ideal class is…",ar:"يكشف شكل الحصة المفضل.",
+  o:[["Short, with lots of games",{G:2,spanAdj:-0.5}],["One really good story",{S:2}],["A discussion where I share my opinion",{Q:2}],["A real project I build",{M:2,P:1}],["Packed with amazing facts",{C:2}]]},
+ {t:"“If I don’t see why something matters, I stop listening.”",tf:1,ar:"هل لازم يشوف أهمية الموضوع لحياته قبل ما يتابع.",
+  o:[["True",{W:2,P:1}],["False",{}]]},
+ {t:"Summer or winter?",decoy:1,o:[["Summer",{}],["Winter",{}]]},
+ {t:"Your friend asks: “Why believe in something you can’t see?” What do you think?",ar:"يكشف علاقته بأسئلة الإيمان: فضول، أو تفكر، أو شعور، أو تجنب.",
+  o:[["Good question. I’ve wondered too",{Q:2},"عنده تساؤلات حقيقية عن الإيمان. ده باب ممتاز لحصص عقيدة بالنقاش."],["There are signs everywhere if you look",{C:2,att:1}],["Some things you just feel",{E:2,att:1}],["I’d rather not get into that",{att:-1},"بيتجنب أسئلة الإيمان العميقة. ما تضغطش عليه في العقيدة المجردة في الأول."]]}
+];
+
+var FINAL=[
+ {id:"f1",t:"If you could ask one question and get a true answer, what would you ask?",ar:"لو يقدر يسأل سؤال واحد ويعرف إجابته الحقيقية"},
+ {id:"f2",t:"Anything you’d like your teacher to know about you?",ar:"حاجة حابب المدرس يعرفها عنه"}
+];
+
+/* ---------------- state ---------------- */
+var KEY="lq_state_v1";
+var st={screen:"intro",sec:0,q:0,name:"",a:{},b:[],c:{}};
+function load(){try{var s=localStorage.getItem(KEY);if(s){var o=JSON.parse(s);if(o&&o.screen)st=o;}}catch(e){}if(!st.c)st.c={};}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+var app=document.getElementById("app");
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+/* ---------------- student screens ---------------- */
+function renderStudent(){
+  document.documentElement.lang="en";
+  var s=st.screen;
+  if(s==="intro")return intro();
+  if(s==="p1")return part1();
+  if(s==="p2intro")return p2intro();
+  if(s==="p2")return part2();
+  if(s==="final")return finalQs();
+  if(s==="done")return done();
+}
+function intro(){
+  app.innerHTML='<h1>Who are you, really?</h1>'+
+  '<p class="muted">A quick game about the stuff you like. There are no right or wrong answers, and nobody gets graded. Just be you.</p>'+
+  '<p class="muted">Part 1 is about your hobbies and favorites. Part 2 is a bunch of quick picks. It takes about 15 minutes.</p>'+
+  '<div class="field" style="margin-top:26px"><label class="q" for="nm">What should we call you?</label>'+
+  '<input type="text" id="nm" autocomplete="off" value="'+esc(st.name)+'"></div>'+
+  '<div class="row"><span></span><button class="btn" id="go">Let’s start</button></div>';
+  document.getElementById("go").onclick=function(){
+    var v=document.getElementById("nm").value.trim();
+    if(!v){document.getElementById("nm").focus();return;}
+    st.name=v;st.screen="p1";st.sec=0;save();render();window.scrollTo(0,0);
+  };
+}
+function part1(){
+  var sec=P1[st.sec],h='';
+  h+='<div class="step">About you, '+(st.sec+1)+' of '+P1.length+'</div>';
+  h+='<div class="bar"><i style="width:'+((st.sec)/P1.length*100)+'%"></i></div>';
+  h+='<h2>'+esc(sec.sec)+'</h2><p class="muted">Skip anything you don’t have an answer for.</p><div style="margin-top:20px">';
+  sec.qs.forEach(function(q){
+    var v=st.a[q.id];
+    h+='<div class="field"><label class="q" '+(q.type==="text"?'for="'+q.id+'"':'id="l_'+q.id+'"')+'>'+esc(q.t)+'</label>';
+    if(q.type==="text"){h+='<textarea id="'+q.id+'" data-id="'+q.id+'">'+esc(v||"")+'</textarea>';}
+    else{
+      var arr=Array.isArray(v)?v:(v?[v]:[]);
+      h+='<div class="chips" role="group" aria-labelledby="l_'+q.id+'">';
+      var list=q.opts.concat(arr.filter(function(x){return q.opts.indexOf(x)<0;}));
+      list.forEach(function(o){h+='<button type="button" class="chip" data-q="'+q.id+'" data-t="'+q.type+'" aria-pressed="'+(arr.indexOf(o)>-1)+'">'+esc(o)+'</button>';});
+      h+='</div><input type="text" class="other" data-q="'+q.id+'" data-t="'+q.type+'" aria-label="Something else" placeholder="Something else? Type it and press Enter">';
+    }
+    h+='</div>';
+  });
+  h+='</div><div class="row"><button class="btn ghost" id="bk">Back</button><button class="btn" id="nx">Next</button></div>';
+  app.innerHTML=h;
+  app.querySelectorAll("textarea").forEach(function(t){t.oninput=function(){st.a[t.dataset.id]=t.value;save();};});
+  app.querySelectorAll(".chip").forEach(function(c){c.onclick=function(){
+    var id=c.dataset.q,txt=c.textContent;
+    if(c.dataset.t==="one"){st.a[id]=txt;app.querySelectorAll('.chip[data-q="'+id+'"]').forEach(function(x){x.setAttribute("aria-pressed",x===c);});}
+    else{var arr=Array.isArray(st.a[id])?st.a[id]:[];var i=arr.indexOf(txt);if(i>-1)arr.splice(i,1);else arr.push(txt);st.a[id]=arr;c.setAttribute("aria-pressed",i===-1);}
+    save();
+  };});
+  app.querySelectorAll("input.other").forEach(function(inp){inp.onkeydown=function(e){
+    if(e.key!=="Enter"||e.isComposing)return;e.preventDefault();
+    var v=inp.value.trim(),id=inp.dataset.q;if(!v)return;
+    if(inp.dataset.t==="one")st.a[id]=v;
+    else{var arr=Array.isArray(st.a[id])?st.a[id]:[];if(arr.indexOf(v)<0)arr.push(v);st.a[id]=arr;}
+    save();render();
+    var n=app.querySelector('input.other[data-q="'+id+'"]');if(n)n.focus();
+  };});
+  document.getElementById("bk").onclick=function(){if(st.sec>0)st.sec--;else st.screen="intro";save();render();window.scrollTo(0,0);};
+  document.getElementById("nx").onclick=function(){if(st.sec<P1.length-1)st.sec++;else st.screen="p2intro";save();render();window.scrollTo(0,0);};
+}
+function p2intro(){
+  app.innerHTML='<div class="hero-badge" aria-hidden="true">⚡</div><h1>Part 2: quick picks</h1>'+
+  '<p class="muted">Just tap whatever feels right. Don’t overthink it. Your first pick is usually the real one.</p>'+
+  '<div class="row"><button class="btn ghost" id="bk">Back</button><button class="btn" id="go">I’m ready</button></div>';
+  document.getElementById("bk").onclick=function(){st.screen="p1";st.sec=P1.length-1;save();render();};
+  document.getElementById("go").onclick=function(){st.screen="p2";st.q=0;save();render();window.scrollTo(0,0);};
+}
+function part2(){
+  var i=st.q,q=P2[i],chosen=st.b[i],h='';
+  h+='<div class="step">Quick picks, '+(i+1)+' of '+P2.length+'</div>';
+  h+='<div class="bar"><i style="width:'+(i/P2.length*100)+'%"></i></div>';
+  h+='<div class="deck"><div class="card flip"><div class="qt">'+esc(q.t)+'</div><div class="opts'+(q.tf?' tf':'')+'">';
+  q.o.forEach(function(o,k){
+    h+='<button type="button" class="opt'+(chosen===k?' sel':'')+'" data-k="'+k+'">'+(q.tf?'':'<span class="k" aria-hidden="true">'+String.fromCharCode(65+k)+'</span>')+'<span>'+esc(o[0])+'</span></button>';
+  });
+  h+='</div><input type="text" class="other'+(chosen==="x"?' picked':'')+'" id="oth" aria-label="Something else" placeholder="Something else? Type it and press Enter" value="'+esc(chosen==="x"?(st.c[i]||""):"")+'"></div></div><div class="row"><button class="btn ghost" id="bk">Back</button><span></span></div>';
+  app.innerHTML=h;
+  var lock=false;
+  app.querySelectorAll(".opt").forEach(function(b){b.onclick=function(){
+    if(lock)return;lock=true;
+    st.b[i]=+b.dataset.k;delete st.c[i];save();
+    app.querySelectorAll(".opt").forEach(function(x){x.classList.toggle("sel",x===b);});
+    setTimeout(function(){if(i<P2.length-1)st.q++;else st.screen="final";save();render();},260);
+  };});
+  document.getElementById("oth").onkeydown=function(e){
+    if(e.key!=="Enter"||e.isComposing)return;e.preventDefault();
+    var v=this.value.trim();if(!v||lock)return;lock=true;
+    st.b[i]="x";st.c[i]=v;save();this.classList.add("picked");
+    app.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel");});
+    setTimeout(function(){if(i<P2.length-1)st.q++;else st.screen="final";save();render();},260);
+  };
+  document.getElementById("bk").onclick=function(){if(st.q>0)st.q--;else st.screen="p2intro";save();render();};
+}
+function finalQs(){
+  var h='<div class="step">Last two, both optional</div><div class="bar"><i style="width:100%"></i></div><h2>Almost done</h2><div style="margin-top:20px">';
+  FINAL.forEach(function(q){h+='<div class="field"><label class="q" for="'+q.id+'">'+esc(q.t)+'</label><textarea id="'+q.id+'" data-id="'+q.id+'">'+esc(st.a[q.id]||"")+'</textarea></div>';});
+  h+='</div><div class="row"><button class="btn ghost" id="bk">Back</button><button class="btn" id="nx">See my result</button></div>';
+  app.innerHTML=h;
+  app.querySelectorAll("textarea").forEach(function(t){t.oninput=function(){st.a[t.dataset.id]=t.value;save();};});
+  document.getElementById("bk").onclick=function(){st.screen="p2";st.q=P2.length-1;save();render();};
+  document.getElementById("nx").onclick=function(){st.screen="done";save();render();window.scrollTo(0,0);};
+}
+function done(){
+  var r=score({n:st.name,a:st.a,b:st.b});
+  var top=r.rank[0],sec=r.rank[1],L=LENS[top],L2=LENS[sec];
+  var code=encode();
+  app.innerHTML='<div class="hero-badge" aria-hidden="true">'+L.emoji+'</div>'+
+  '<p class="step">'+esc(st.name)+', you’re…</p><h1>'+esc(L.en)+'</h1>'+
+  '<p>'+esc(L.blurb)+'</p><p class="muted">With a strong streak of '+esc(L2.en)+' '+L2.emoji+'</p>'+
+  '<h2 style="margin-top:34px">One last step</h2><p class="muted">Copy your result code and send it to your teacher.</p>'+
+  '<textarea class="code" id="code" readonly>'+code+'</textarea>'+
+  '<div class="row"><button class="btn ghost" id="again">Start over</button><button class="btn" id="cp">Copy code</button></div><p id="msg" class="ok" style="text-align:right;min-height:24px"></p>';
+  document.getElementById("cp").onclick=function(){
+    var ta=document.getElementById("code"),m=document.getElementById("msg");
+    function fallback(){ta.focus();ta.select();try{document.execCommand("copy");m.textContent="Copied";}catch(e){m.textContent="Select the code and copy it";}}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(function(){m.textContent="Copied";},fallback);}else fallback();
+  };
+  document.getElementById("again").onclick=function(){
+    if(!confirm("Start over? Your answers will be cleared."))return;
+    st={screen:"intro",sec:0,q:0,name:"",a:{},b:[],c:{}};save();render();
+  };
+}
+
+/* ---------------- encode / decode ---------------- */
+function encode(){
+  var json=JSON.stringify({v:1,n:st.name,d:new Date().toISOString().slice(0,10),a:st.a,b:st.b,c:st.c});
+  var b64=btoa(unescape(encodeURIComponent(json))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  return "LQ1-"+b64;
+}
+function decode(code){
+  code=code.replace(/\s+/g,"");
+  if(code.indexOf("LQ1-")!==0)throw new Error("bad");
+  var b=code.slice(4).replace(/-/g,"+").replace(/_/g,"/");
+  while(b.length%4)b+="=";
+  return JSON.parse(decodeURIComponent(escape(atob(b))));
+}
+
+/* ---------------- scoring ---------------- */
+function score(d){
+  var tot={},max={};LORDER.forEach(function(k){tot[k]=0;max[k]=0;});
+  var x={att:0,W:0,E:0,cmp:0,soc:0,span:2,spanAdj:0},flags=[];
+  P2.forEach(function(q,i){
+    LORDER.forEach(function(k){var m=0;q.o.forEach(function(o){if((o[1][k]||0)>m)m=o[1][k];});max[k]+=m;});
+    var c=d.b[i];if(c==null||!q.o[c])return;
+    var s=q.o[c][1];
+    LORDER.forEach(function(k){if(s[k])tot[k]+=s[k];});
+    ["att","W","E","cmp","soc","spanAdj"].forEach(function(k){if(s[k])x[k]+=s[k];});
+    if(s.span)x.span=s.span;
+    if(q.o[c][2])flags.push(q.o[c][2]);
+  });
+  var g3=d.a.g3||[];if(g3.some(function(v){return v!=="Alone";}))x.soc+=1;
+  var g5=d.a.g5||[];if(g5.indexOf("Winning and competing")>-1)x.cmp+=1;
+  var pct={};LORDER.forEach(function(k){pct[k]=max[k]?Math.max(0,Math.round(tot[k]/max[k]*100)):0;});
+  var rank=LORDER.slice().sort(function(a,b){return pct[b]-pct[a];});
+  return {pct:pct,rank:rank,x:x,flags:flags};
+}
+
+/* ---------------- teacher view ---------------- */
+var tState={tab:"report",data:null,err:""};
+function arDigits(n){return String(n).replace(/\d/g,function(d){return"٠١٢٣٤٥٦٧٨٩"[d];});}
+function renderTeacher(){
+  document.documentElement.lang="ar";
+  var h='<div class="ar"><h1>تحليل لعبة التعارف</h1>'+
+  '<div id="tv"></div></div>';
+  app.innerHTML=h;
+  var tv=document.getElementById("tv");
+  if(!tState.data){
+    tv.innerHTML='<p>الصق كود النتيجة اللي بعتهولك الطالب هنا.</p>'+
+    '<textarea class="code" id="pc" dir="ltr"></textarea>'+
+    '<p class="muted" style="color:var(--coral)">'+esc(tState.err)+'</p>'+
+    '<div class="row"><span></span><button class="btn" id="show">اعرض التقرير</button></div>';
+    document.getElementById("show").onclick=function(){
+      try{tState.data=decode(document.getElementById("pc").value);tState.err="";}
+      catch(e){tState.err="الكود ده مش مكتمل أو فيه خطأ. اتأكد إنه بيبدأ بـ LQ1 ومنسوخ كله.";}
+      renderTeacher();
+    };
+    return;
+  }
+  tv.innerHTML=reportHTML(tState.data)+
+  '<div class="row"><button class="btn ghost" id="nw">تقرير طالب تاني</button><button class="btn" id="dl">حمّل التقرير ملف مطبوع</button></div><p id="dm" class="muted"></p>';
+  document.getElementById("nw").onclick=function(){tState.data=null;renderTeacher();};
+  document.getElementById("dl").onclick=downloadReport;
+}
+function lensLine(k,v,top){
+  return '<div class="lens'+(top?' top':'')+'"><div class="t"><span>'+LENS[k].ar+'</span><span>'+arDigits(v)+'٪</span></div><div class="b"><i style="width:'+v+'%"></i></div></div>';
+}
+function reportHTML(d){
+  var r=score(d),x=r.x,h='';
+  h+='<h2 style="margin-top:6px">'+esc(d.n||"طالب")+'</h2><p class="muted">تاريخ الإجابة '+arDigits(d.d||"")+'</p>';
+  h+='<h2>المداخل السبعة</h2>';
+  r.rank.forEach(function(k,i){h+=lensLine(k,r.pct[k],i<2);});
+  h+='<h2>أقوى مدخلين معاه</h2>';
+  r.rank.slice(0,2).forEach(function(k){
+    h+='<div class="box"><h3>'+LENS[k].ar+'</h3><p>'+LENS[k].tip+'</p><p class="muted">أمثلة: '+LENS[k].ex+'</p></div>';
+  });
+  var weak=r.rank[r.rank.length-1];
+  h+='<div class="box"><h3>أضعف مدخل: '+LENS[weak].ar+'</h3><p>ما تعتمدش عليه كبداية مع الطالب ده، واستخدمه بس كجزء صغير بعد ما يندمج.</p></div>';
+  h+='<h2>طريقة التعامل</h2>';
+  var att=x.att,attTxt;
+  if(att>=3)attTxt="قريب ومنفتح على الدين. ينفع تتعمق معاه في المعاني والعبادة بشكل مباشر.";
+  else if(att<=-2)attTxt="بعيد أو متحفظ تجاه الكلام الديني. ابدأ بالمحتوى غير المباشر والأسئلة والقصص، وتجنب أسلوب الأوامر والوعظ في الأول.";
+  else attTxt="محايد. محتاج ربط واضح بحياته واهتماماته قبل أي كلام ديني مباشر.";
+  h+='<div class="box"><h3>موقفه من الدين</h3><p>'+attTxt+'</p></div>';
+  var sp=x.span+x.spanAdj,spTxt;
+  if(sp<=1.5)spTxt="قصير جداً. خلي كل جزء من ٣ لـ ٥ دقايق، وغيّر النشاط كتير.";
+  else if(sp<=2.5)spTxt="متوسط. كل جزء من ٥ لـ ٨ دقايق.";
+  else spTxt="طويل. يقدر يتابع ١٠ دقايق أو أكتر لو المحتوى شيق.";
+  h+='<div class="box"><h3>مدة التركيز</h3><p>'+spTxt+'</p></div>';
+  var mind=x.W,heart=x.E,mhTxt;
+  if(heart>mind+1)mhTxt="مدخله القلب والمشاعر أكتر من الأدلة. ابدأ بالإحساس والقصة المؤثرة.";
+  else if(mind>heart+1)mhTxt="مدخله العقل والإقناع. ابدأ بالحكمة (ليه) قبل الحكم (إيه)، خصوصاً في العبادات.";
+  else mhTxt="متوازن بين العقل والقلب. اخلط الدليل بالقصة المؤثرة.";
+  h+='<div class="box"><h3>العقل أم القلب</h3><p>'+mhTxt+'</p></div>';
+  if(x.cmp>=2)h+='<div class="box"><h3>بيحب المنافسة</h3><p>استخدم النقاط والتحدي ضد الوقت، وممكن يتحدى رقمه القياسي في الحصة اللي فاتت.</p></div>';
+  if(x.soc>=2)h+='<div class="box"><h3>بيحب التفاعل مع حد</h3><p>الحوار المتبادل والأدوار التمثيلية هتنفع معاه أكتر من الشرح من طرف واحد.</p></div>';
+  if(r.flags.length){
+    h+='<h2>ملاحظات تستحق الانتباه</h2>';
+    r.flags.forEach(function(f){h+='<div class="box flag"><p style="margin:0">'+f+'</p></div>';});
+  }
+  h+='<h2>إجابات الجزء الأول</h2><div class="box">';
+  P1.forEach(function(sec){
+    sec.qs.forEach(function(q){
+      var v=d.a[q.id];if(Array.isArray(v))v=v.join(", ");
+      h+='<div class="item"><div class="p">'+q.ar+'</div><div class="en ans">'+(v?esc(v):'<span class="muted">(skipped)</span>')+'</div></div>';
+    });
+  });
+  FINAL.forEach(function(q){var v=d.a[q.id];h+='<div class="item"><div class="p">'+q.ar+'</div><div class="en ans">'+(v?esc(v):'<span class="muted">(skipped)</span>')+'</div></div>';});
+  h+='</div><h2>إجابات الجزء التاني</h2><div class="box">';
+  P2.forEach(function(q,i){
+    var c=d.b[i],o=q.o[c],cu=(c==="x"&&d.c)?d.c[i]:"";
+    h+='<div class="item"><div class="p">'+arDigits(i+1)+'. '+(q.decoy?'سؤال تمويه':q.ar)+(o&&o[2]?'<span class="tag c">ملاحظة</span>':'')+(cu?'<span class="tag c">إجابة بكلامه</span>':'')+'</div>'+
+    '<div class="en">'+esc(q.t)+'</div><div class="en ans">'+(o?esc(o[0]):cu?esc(cu):'<span class="muted">(no answer)</span>')+'</div></div>';
+  });
+  h+='</div>';
+  return h;
+}
+function ptsAr(s){
+  var out=[];
+  LORDER.forEach(function(k){if(s[k])out.push(LENS[k].ar+" "+(s[k]>0?"+":"−")+arDigits(Math.abs(s[k])));});
+  if(s.att)out.push("القرب من الدين "+(s.att>0?"+":"−")+arDigits(Math.abs(s.att)));
+  if(s.W)out.push("يحتاج الحكمة +"+arDigits(s.W));
+  if(s.E)out.push("مدخل القلب +"+arDigits(s.E));
+  if(s.cmp)out.push("المنافسة +"+arDigits(s.cmp));
+  if(s.soc)out.push("التفاعل مع الآخرين +"+arDigits(s.soc));
+  if(s.span)out.push("مدة التركيز: "+["","قصيرة","متوسطة","طويلة"][s.span]);
+  if(s.spanAdj)out.push("تقلل مدة التركيز");
+  return out.length?out.join("، "):"بدون نقاط";
+}
+function keyHTML(){
+  var h='<p class="muted">كل سؤال في الجزء التاني وغرضه الخفي، وكل اختيار بيدّي نقاط لأنهي مدخل.</p><div class="box">';
+  P2.forEach(function(q,i){
+    h+='<div class="item"><div><strong>'+arDigits(i+1)+'.</strong> '+(q.decoy?'سؤال تمويه، ملوش أي غرض.':q.ar)+'</div><div class="en">'+esc(q.t)+'</div>';
+    if(!q.decoy)q.o.forEach(function(o){h+='<div class="en" style="margin-top:8px">'+esc(o[0])+'</div><div class="p">'+ptsAr(o[1])+(o[2]?'<span class="tag c">ملاحظة</span>':'')+'</div>';});
+    h+='</div>';
+  });
+  return h+'</div>';
+}
+var libsP=null;
+function loadScript(u){return new Promise(function(res,rej){var s=document.createElement("script");s.src=u;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+function loadLibs(){
+  if(!libsP)libsP=Promise.all([
+    loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"),
+    loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js")
+  ]).catch(function(e){libsP=null;throw e;});
+  return libsP;
+}
+async function makePDF(d){
+  await loadLibs();
+  try{await document.fonts.ready;}catch(e){}
+  var box=document.createElement("div");
+  box.className="ar pdfmode";
+  box.style.cssText="position:fixed;left:-10000px;top:0;width:760px;padding:0 6px";
+  box.innerHTML='<h1>تحليل لعبة التعارف</h1>'+reportHTML(d);
+  document.body.appendChild(box);
+  var blocks=[];
+  Array.prototype.forEach.call(box.children,function(el){
+    var items=el.classList.contains("box")?el.querySelectorAll(":scope > .item"):[];
+    if(items.length>2)Array.prototype.forEach.call(items,function(it){blocks.push(it);});
+    else blocks.push(el);
+  });
+  var pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4"});
+  var W=210,H=297,M=14,UW=W-2*M,y=M;
+  try{
+    for(var i=0;i<blocks.length;i++){
+      var el=blocks[i];
+      var c=await html2canvas(el,{scale:2,backgroundColor:"#ffffff",logging:false,useCORS:true});
+      if(!c.width||!c.height)continue;
+      var h=c.height*UW/c.width,isHead=/^H[123]$/.test(el.tagName);
+      if(isHead&&y>M)y+=4;
+      if(h<=H-2*M){
+        if(y+h+(isHead?18:0)>H-M){pdf.addPage();y=M;}
+        pdf.addImage(c.toDataURL("image/jpeg",0.92),"JPEG",M,y,UW,h);
+        y+=h+(isHead?1:3);
+      }else{
+        var pxPerMm=c.width/UW,off=0;
+        while(off<c.height){
+          if(y>H-M-20){pdf.addPage();y=M;}
+          var sliceH=Math.min(c.height-off,Math.floor((H-M-y)*pxPerMm));
+          var t=document.createElement("canvas");t.width=c.width;t.height=sliceH;
+          t.getContext("2d").drawImage(c,0,off,c.width,sliceH,0,0,c.width,sliceH);
+          var sh=sliceH/pxPerMm;
+          pdf.addImage(t.toDataURL("image/jpeg",0.92),"JPEG",M,y,UW,sh);
+          off+=sliceH;y+=sh;
+          if(off<c.height){pdf.addPage();y=M;}
+        }
+        y+=3;
+      }
+    }
+  }finally{document.body.removeChild(box);}
+  return pdf.output("blob");
+}
+async function downloadReport(){
+  var m=document.getElementById("dm"),b=document.getElementById("dl");
+  b.disabled=true;m.textContent="جاري تجهيز الملف، استنى ثواني…";
+  try{
+    var dl=null;
+    try{dl=(window.claude&&window.claude.use)?await window.claude.use("downloads"):null;}catch(e){dl=null;}
+    var blob=await makePDF(tState.data);
+    var fname="report-"+(tState.data.n||"student").replace(/[^\w\u0600-\u06FF]+/g,"-")+".pdf";
+    m.textContent="";
+    if(!dl){
+      var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(function(){URL.revokeObjectURL(a.href);},4000);
+      m.textContent="اتحفظ الملف.";return;
+    }
+    await dl.save({filename:fname,data:blob});
+    m.textContent="اتحفظ الملف.";
+  }catch(e){
+    m.textContent=(e&&e.code==="declined")?"التحميل اتلغى.":"الملف ما اتعملش. ابعت الكود في المحادثة وهطلعلك الملف.";
+  }finally{b.disabled=false;}
+}
+
+/* ---------------- router ---------------- */
+function render(){
+  renderTeacher();
+}
+load();render();
+window.addEventListener("hashchange",render);
+</script>
+</body>
+</html>
