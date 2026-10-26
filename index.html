@@ -86,13 +86,6 @@ input:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px }
 }
 :root[data-theme="dark"] .badge.done { background: #064E3B; color: #6EE7B7 }
 :root[data-theme="dark"] .badge.prog { background: #78350F; color: #FDE68A }
-.teacher-link {
-  display: block; text-align: center; margin-top: 36px; padding: 14px;
-  font-weight: 600; font-size: 15px; color: var(--muted); text-decoration: none;
-  border: 2px dashed var(--line); border-radius: 14px;
-  font-family: "Alexandria", Tahoma, sans-serif;
-}
-.teacher-link:hover { border-color: var(--ink); color: var(--ink) }
 .shake { animation: shake .4s ease }
 @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
 @media (prefers-reduced-motion: reduce) { .shake { animation: none } .card:hover { transform: none } }
@@ -110,7 +103,6 @@ input:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px }
 
   <div class="grid" id="grid"></div>
 
-  <a href="teacher.html" class="teacher-link">عرض المعلم — Teacher view</a>
 </div>
 
 <script src="shared.js"></script>
