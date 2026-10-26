@@ -78,11 +78,15 @@ textarea.big{min-height:100px;font-size:12px}
 .part-badge{border-radius:10px;padding:6px 12px;font-size:14px;font-weight:600;border:2px solid var(--line);background:var(--surface)}
 .part-badge.present{border-color:var(--teal);background:var(--teal);color:#fff}
 .sep{border:0;border-top:2px solid var(--line);margin:20px 0}
+.ok{color:var(--teal);font-weight:800}
+.pdfmode{--bg:#fff;--surface:#fff;--ink:#1E2140;--muted:#5D6088;--line:#DCDAF5;--teal:#1F9E91;--coral:#E9505A;--violet:#5B4BDB;--violet-soft:#E7E4FF;color:#1E2140;background:#fff;font-size:16px}
 </style>
 </head>
 <body>
 <main class="wrap" id="app"></main>
 <script src="shared.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 var app=document.getElementById("app");
 var tData=null;
@@ -238,9 +242,123 @@ function renderReport(){
     h+='</div>';
   }
 
-  h+='<div class="row"><button class="btn ghost" id="nw">تقرير طالب تاني</button></div>';
+  h+='<div class="row"><button class="btn ghost" id="nw">تقرير طالب تاني</button><button class="btn" id="dl">حمّل التقرير PDF</button></div>';
+  h+='<p id="dm" class="muted"></p>';
   app.innerHTML=h;
   document.getElementById("nw").onclick=function(){tData=null;renderPaste();window.scrollTo(0,0);};
+  document.getElementById("dl").onclick=downloadReport;
+}
+
+function buildReportHTML(d){
+  var r=score(d),x=r.x;
+  var h='<h1>تحليل لعبة التعارف</h1>';
+  h+='<h2 style="margin-top:6px">'+esc(d.n||"طالب")+'</h2>';
+  if(d.d)h+='<p class="muted">تاريخ الإجابة '+arDigits(d.d)+'</p>';
+  var hasP2=d._parts.some(function(p){return p!=="LQP1";});
+  if(hasP2){
+    h+='<h2>المداخل السبعة</h2>';
+    r.rank.forEach(function(k,i){h+=lensLine(k,r.pct[k],i<2);});
+    h+='<h2>أقوى مدخلين معاه</h2>';
+    r.rank.slice(0,2).forEach(function(k){
+      h+='<div class="box"><h3>'+LENS[k].ar+'</h3><p>'+LENS[k].tip+'</p><p class="muted">أمثلة: '+LENS[k].ex+'</p></div>';
+    });
+    var weak=r.rank[r.rank.length-1];
+    h+='<div class="box"><h3>أضعف مدخل: '+LENS[weak].ar+'</h3><p>ما تعتمدش عليه كبداية مع الطالب ده.</p></div>';
+    h+='<h2>طريقة التعامل</h2>';
+    var att=x.att,attTxt;
+    if(att>=3)attTxt="قريب ومنفتح على الدين.";
+    else if(att<=-2)attTxt="بعيد أو متحفظ تجاه الكلام الديني. ابدأ بالمحتوى غير المباشر.";
+    else attTxt="محايد. محتاج ربط واضح بحياته قبل أي كلام ديني مباشر.";
+    h+='<div class="box"><h3>موقفه من الدين</h3><p>'+attTxt+'</p></div>';
+    var sp=x.span+x.spanAdj,spTxt;
+    if(sp<=1.5)spTxt="قصير جداً.";else if(sp<=2.5)spTxt="متوسط.";else spTxt="طويل.";
+    h+='<div class="box"><h3>مدة التركيز</h3><p>'+spTxt+'</p></div>';
+    if(r.flags.length){
+      h+='<h2>ملاحظات</h2>';
+      r.flags.forEach(function(f){h+='<div class="box flag"><p style="margin:0">'+f+'</p></div>';});
+    }
+  }
+  if(d._parts.indexOf("LQP1")>-1){
+    h+='<h2>إجابات الجزء الأول</h2><div class="box">';
+    P1.forEach(function(sec){sec.qs.forEach(function(q){
+      var v=d.a[q.id];if(Array.isArray(v))v=v.join(", ");
+      h+='<div class="item"><div class="p">'+q.ar+'</div><div class="en ans">'+(v?esc(v):'(skipped)')+'</div></div>';
+    });});
+    h+='</div>';
+  }
+  if(hasP2){
+    h+='<h2>إجابات الاختيارات السريعة</h2>';
+    [{l:"١",p:"LQ2A",r:P2_RANGES.A},{l:"٢",p:"LQ2B",r:P2_RANGES.B},{l:"٣",p:"LQ2C",r:P2_RANGES.C}].forEach(function(rng){
+      if(d._parts.indexOf(rng.p)<0)return;
+      h+='<h3>اختيارات سريعة '+rng.l+'</h3><div class="box">';
+      for(var i=rng.r.s;i<rng.r.e;i++){
+        var q=P2[i],c=d.b[i],o=q.o[c],cu=d.c[i]||"";
+        h+='<div class="item"><div class="en">'+esc(q.t)+'</div><div class="en ans">'+(o?esc(o[0]):cu?esc(cu):'(no answer)')+'</div></div>';
+      }
+      h+='</div>';
+    });
+  }
+  return h;
+}
+
+async function makePDF(d){
+  try{await document.fonts.ready;}catch(e){}
+  var box=document.createElement("div");
+  box.className="pdfmode";
+  box.style.cssText="position:fixed;left:-10000px;top:0;width:760px;padding:0 6px;direction:rtl;text-align:right;font-family:Alexandria,Tahoma,sans-serif;line-height:1.85";
+  box.innerHTML=buildReportHTML(d);
+  document.body.appendChild(box);
+  var blocks=[];
+  Array.prototype.forEach.call(box.children,function(el){
+    var items=el.classList.contains("box")?el.querySelectorAll(":scope > .item"):[];
+    if(items.length>2)Array.prototype.forEach.call(items,function(it){blocks.push(it);});
+    else blocks.push(el);
+  });
+  var pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4"});
+  var W=210,H=297,M=14,UW=W-2*M,y=M;
+  try{
+    for(var i=0;i<blocks.length;i++){
+      var el=blocks[i];
+      var c=await html2canvas(el,{scale:2,backgroundColor:"#ffffff",logging:false,useCORS:true});
+      if(!c.width||!c.height)continue;
+      var h=c.height*UW/c.width,isHead=/^H[123]$/.test(el.tagName);
+      if(isHead&&y>M)y+=4;
+      if(h<=H-2*M){
+        if(y+h+(isHead?18:0)>H-M){pdf.addPage();y=M;}
+        pdf.addImage(c.toDataURL("image/jpeg",0.92),"JPEG",M,y,UW,h);
+        y+=h+(isHead?1:3);
+      }else{
+        var pxPerMm=c.width/UW,off=0;
+        while(off<c.height){
+          if(y>H-M-20){pdf.addPage();y=M;}
+          var sliceH=Math.min(c.height-off,Math.floor((H-M-y)*pxPerMm));
+          var t=document.createElement("canvas");t.width=c.width;t.height=sliceH;
+          t.getContext("2d").drawImage(c,0,off,c.width,sliceH,0,0,c.width,sliceH);
+          var sh=sliceH/pxPerMm;
+          pdf.addImage(t.toDataURL("image/jpeg",0.92),"JPEG",M,y,UW,sh);
+          off+=sliceH;y+=sh;
+          if(off<c.height){pdf.addPage();y=M;}
+        }
+        y+=3;
+      }
+    }
+  }finally{document.body.removeChild(box);}
+  return pdf.output("blob");
+}
+
+async function downloadReport(){
+  var m=document.getElementById("dm"),b=document.getElementById("dl");
+  b.disabled=true;m.textContent="جاري تجهيز الملف، استنى ثواني…";
+  try{
+    var blob=await makePDF(tData);
+    var fname="report-"+(tData.n||"student").replace(/[^\w؀-ۿ]+/g,"-")+".pdf";
+    var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},4000);
+    m.textContent="اتحفظ الملف.";
+  }catch(e){
+    m.textContent="حصل مشكلة في تجهيز الملف. جرب تاني.";
+  }finally{b.disabled=false;}
 }
 
 renderPaste();
